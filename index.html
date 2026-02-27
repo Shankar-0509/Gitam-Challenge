@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediScan — Health Risk Detection</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060a14;
+    --surface: #0d1628;
+    --card: #111c35;
+    --border: #1e2f55;
+    --accent: #00e5c8;
+    --accent2: #ff4d6a;
+    --accent3: #ffc535;
+    --text: #e8f0ff;
+    --muted: #7a90b8;
+    --low: #00e5c8;
+    --med: #ffc535;
+    --high: #ff4d6a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,229,200,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,200,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    pointer-events: none;
+    animation: pulse 8s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: #00e5c8; top: -100px; left: -100px; animation-delay: 0s; }
+  .orb2 { width: 400px; height: 400px; background: #ff4d6a; bottom: -80px; right: -80px; animation-delay: 4s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.12; transform: scale(1); }
+    50% { opacity: 0.2; transform: scale(1.1); }
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+  /* HEADER */
+  header { text-align: center; margin-bottom: 60px; }
+
+  .logo-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,229,200,0.08);
+    border: 1px solid rgba(0,229,200,0.2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .logo-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+  h1 .cyan { color: var(--accent); }
+  h1 .dim { color: var(--muted); font-weight: 400; font-family: 'Fraunces', serif; font-style: italic; }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* DISEASE BADGES */
+  .disease-row {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 24px 0;
+  }
+  .disease-badge {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 14px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px; margin-bottom: 32px; }
+  .tab {
+    flex: 1; padding: 10px; text-align: center; border-radius: 6px; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 12px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .tab.active {
+    background: var(--card); color: var(--accent);
+    border-color: rgba(0,229,200,0.2);
+    box-shadow: 0 0 20px rgba(0,229,200,0.1);
+  }
+
+  /* FORM PANEL */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .field input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .field input:focus {
+    border-color: rgba(0,229,200,0.4);
+    box-shadow: 0 0 0 3px rgba(0,229,200,0.08);
+  }
+  .field input::placeholder { color: var(--border); }
+
+  .section-label {
+    font-family: 'Syne', sans-serif; font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    margin-top: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  /* FILE UPLOAD */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 48px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .upload-zone:hover { border-color: rgba(0,229,200,0.4); background: rgba(0,229,200,0.03); }
+  .upload-zone.drag { border-color: var(--accent); background: rgba(0,229,200,0.06); }
+  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-icon { font-size: 40px; margin-bottom: 12px; }
+  .upload-text { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .upload-sub { font-size: 11px; color: var(--muted); }
+  .file-name { color: var(--accent); margin-top: 12px; font-size: 12px; }
+
+  /* ANALYZE BUTTON */
+  .btn-analyze {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #00e5c8, #00b8a0);
+    border: none; border-radius: 8px;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+    color: #06121e; cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 8px 32px rgba(0,229,200,0.25);
+  }
+  .btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,229,200,0.35); }
+  .btn-analyze:active { transform: translateY(0); }
+  .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* LOADING */
+  .loader {
+    display: none; text-align: center; padding: 48px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    margin-top: 24px;
+  }
+  .loader.show { display: block; }
+  .scan-lines {
+    width: 120px; height: 120px; margin: 0 auto 20px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    position: relative;
+    animation: spin 2s linear infinite;
+  }
+  .scan-lines::after {
+    content: ''; position: absolute; inset: 8px;
+    border: 2px solid transparent;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1.2s linear infinite reverse;
+  }
+  .scan-lines::before {
+    content: '⚕'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px; animation: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-text { color: var(--muted); font-size: 12px; letter-spacing: 2px; animation: flicker 1.5s infinite; }
+  @keyframes flicker { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* RESULTS */
+  #results { margin-top: 32px; display: none; }
+  #results.show { display: block; animation: slideUp 0.4s ease; }
+  @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+  /* RISK BANNER */
+  .risk-banner {
+    border-radius: 12px; padding: 24px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; border: 1px solid;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .risk-banner.LOW { background: rgba(0,229,200,0.08); border-color: rgba(0,229,200,0.25); }
+  .risk-banner.MEDIUM { background: rgba(255,197,53,0.08); border-color: rgba(255,197,53,0.25); }
+  .risk-banner.HIGH { background: rgba(255,77,106,0.1); border-color: rgba(255,77,106,0.3); }
+
+  .risk-label { font-family: 'Syne', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  .risk-value { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+  .risk-banner.LOW .risk-value { color: var(--low); }
+  .risk-banner.MEDIUM .risk-value { color: var(--med); }
+  .risk-banner.HIGH .risk-value { color: var(--high); }
+
+  .urgency-chip {
+    padding: 6px 16px; border-radius: 100px;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+  }
+  .urgency-IMMEDIATE { background: rgba(255,77,106,0.2); color: var(--high); border: 1px solid rgba(255,77,106,0.4); }
+  .urgency-SOON { background: rgba(255,197,53,0.15); color: var(--med); border: 1px solid rgba(255,197,53,0.3); }
+  .urgency-ROUTINE { background: rgba(0,229,200,0.1); color: var(--low); border: 1px solid rgba(0,229,200,0.25); }
+
+  /* ML PREDICTIONS */
+  .predictions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
+
+  .pred-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    transition: all 0.2s;
+  }
+  .pred-card.detected { border-color: rgba(255,77,106,0.3); background: rgba(255,77,106,0.05); }
+  .pred-card.safe { border-color: rgba(0,229,200,0.2); background: rgba(0,229,200,0.03); }
+
+  .pred-name { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .pred-status { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .pred-card.detected .pred-status { color: var(--high); }
+  .pred-card.safe .pred-status { color: var(--low); }
+
+  .confidence-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+  .confidence-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+  .pred-card.detected .confidence-fill { background: var(--high); }
+  .pred-card.safe .confidence-fill { background: var(--low); }
+  .confidence-text { font-size: 10px; color: var(--muted); }
+
+  /* INFO CARDS */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  .info-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+  }
+  .info-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  .info-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .info-card li { font-size: 12px; color: var(--text); line-height: 1.5; padding-left: 14px; position: relative; }
+  .info-card li::before { content: '→'; position: absolute; left: 0; color: var(--muted); }
+
+  .risks-major li::before { color: var(--high); content: '!'; font-weight: 700; }
+  .risks-minor li::before { color: var(--med); content: '~'; }
+  .recommendations li::before { color: var(--low); content: '✓'; }
+
+  /* SUMMARY */
+  .summary-card {
+    background: linear-gradient(135deg, rgba(0,229,200,0.05), rgba(255,77,106,0.03));
+    border: 1px solid rgba(0,229,200,0.15); border-radius: 10px; padding: 24px;
+    margin-bottom: 24px;
+  }
+  .summary-card h3 { font-family: 'Syne', sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .summary-card p { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; line-height: 1.7; color: var(--text); }
+
+  /* DOCTOR */
+  .doctor-card {
+    border-radius: 10px; padding: 18px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .doctor-YES { background: rgba(255,77,106,0.08); border: 1px solid rgba(255,77,106,0.25); }
+  .doctor-NO { background: rgba(0,229,200,0.05); border: 1px solid rgba(0,229,200,0.2); }
+  .doctor-icon { font-size: 28px; }
+  .doctor-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+  .doctor-YES .doctor-text { color: var(--high); }
+  .doctor-NO .doctor-text { color: var(--low); }
+
+  /* FOOTER */
+  footer { text-align: center; margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 10px; letter-spacing: 2px; }
+
+  @media (max-width: 600px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .risk-banner { flex-direction: column; }
+  }
+
+  .error-box {
+    background: rgba(255,77,106,0.08); border: 1px solid rgba(255,77,106,0.3);
+    border-radius: 8px; padding: 16px; color: var(--high); font-size: 12px;
+    margin-top: 16px; display: none;
+  }
+  .error-box.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="wrapper">
+  <header>
+    <div class="logo-pill"><div class="dot"></div> ML-Powered</div>
+    <h1>Medi<span class="cyan">Scan</span><br><span class="dim">Health Risk Detection</span></h1>
+    <p class="subtitle">Early detection of chronic conditions using trained ML models. Upload health data or enter values manually.</p>
+    <div class="disease-row">
+      <span class="disease-badge">🩸 Diabetes</span>
+      <span class="disease-badge">❤️ Heart Disease</span>
+      <span class="disease-badge">🫘 Kidney (CKD)</span>
+      <span class="disease-badge">🫀 Liver Disease</span>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('manual')">Manual Input</div>
+    <div class="tab" onclick="switchTab('pdf')">Upload PDF</div>
+    <div class="tab" onclick="switchTab('csv')">Upload CSV</div>
+  </div>
+
+  <!-- MANUAL PANEL -->
+  <div class="panel active" id="panel-manual">
+    <div class="section-label">Basic Info</div>
+    <div class="form-grid">
+      <div class="field"><label>Age (years)</label><input type="number" id="Age" placeholder="45" min="1" max="120"></div>
+      <div class="field"><label>Glucose (mg/dL)</label><input type="number" id="Glucose" placeholder="120" min="50" max="400"></div>
+      <div class="field"><label>Blood Pressure (mmHg)</label><input type="number" id="Blood Pressure" placeholder="80" min="40" max="200"></div>
+      <div class="field"><label>BMI</label><input type="number" id="BMI" placeholder="28.5" step="0.1" min="10" max="60"></div>
+    </div>
+    <div class="section-label">Lab Values</div>
+    <div class="form-grid">
+      <div class="field"><label>Cholesterol (mg/dL)</label><input type="number" id="Cholesterol" placeholder="200" min="100" max="500"></div>
+      <div class="field"><label>Heart Rate (bpm)</label><input type="number" id="Heart Rate" placeholder="72" min="40" max="220"></div>
+      <div class="field"><label>Insulin (μU/mL)</label><input type="number" id="Insulin" placeholder="80" min="0" max="900"></div>
+      <div class="field"><label>Creatinine (mg/dL)</label><input type="number" id="Creatinine" placeholder="1.0" step="0.1" min="0" max="20"></div>
+    </div>
+    <div class="section-label">Liver Panel</div>
+    <div class="form-grid">
+      <div class="field"><label>Total Bilirubin (mg/dL)</label><input type="number" id="Total_Bilirubin" placeholder="1.0" step="0.1"></div>
+      <div class="field"><label>Alkaline Phosphatase</label><input type="number" id="Alkaline_Phosphotase" placeholder="200"></div>
+      <div class="field"><label>ALT (Alamine AT)</label><input type="number" id="Alamine_Aminotransferase" placeholder="40"></div>
+      <div class="field"><label>Albumin (g/dL)</label><input type="number" id="Albumin" placeholder="3.5" step="0.1"></div>
+    </div>
+    <button class="btn-analyze" onclick="analyzeManual()">⚕ Analyze Health Data</button>
+  </div>
+
+  <!-- PDF PANEL -->
+  <div class="panel" id="panel-pdf">
+    <div class="upload-zone" id="pdfZone">
+      <input type="file" id="pdfFile" accept=".pdf" onchange="handleFileSelect(this, 'pdf')">
+      <div class="upload-icon">📄</div>
+      <div class="upload-text">Drop your health report PDF here</div>
+      <div class="upload-sub">or click to browse · PDF files only</div>
+      <div class="file-name" id="pdfName"></div>
+    </div>
+    <br>
+    <button class="btn-analyze" onclick="analyzeFile('pdf')">⚕ Analyze PDF Report</button>
+  </div>
+
+  <!-- CSV PANEL -->
+  <div class="panel" id="panel-csv">
+    <div class="upload-zone" id="csvZone">
+      <input type="file" id="csvFile" accept=".csv" onchange="handleFileSelect(this, 'csv')">
+      <div class="upload-icon">📊</div>
+      <div class="upload-text">Drop your health data CSV here</div>
+      <div class="upload-sub">or click to browse · CSV files only</div>
+      <div class="file-name" id="csvName"></div>
+    </div>
+    <br>
+    <button class="btn-analyze" onclick="analyzeFile('csv')">⚕ Analyze CSV Data</button>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="scan-lines"></div>
+    <div class="loader-text">SCANNING HEALTH PARAMETERS...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <!-- Filled dynamically -->
+  </div>
+
+  <footer>MEDISCAN v1.0 · HEALTH RISK EARLY DETECTION · HACKATHON PROJECT · ⚕</footer>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const tabs = ['manual','pdf','csv'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  hideResults();
+}
+
+function handleFileSelect(input, type) {
+  const name = input.files[0]?.name || '';
+  document.getElementById(type + 'Name').textContent = name ? '✓ ' + name : '';
+}
+
+function hideResults() {
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = '⚠ ' + msg;
+  box.classList.add('show');
+}
+
+async function analyzeManual() {
+  const fields = ['Age','Glucose','Blood Pressure','BMI','Cholesterol','Heart Rate',
+    'Insulin','Creatinine','Total_Bilirubin','Alkaline_Phosphotase','Alamine_Aminotransferase','Albumin'];
+  const data = {};
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    if (el && el.value) data[f] = parseFloat(el.value);
+  });
+
+  if (Object.keys(data).length < 2) {
+    showError('Please fill in at least a few values to analyze.'); return;
+  }
+
+  showLoader();
+  try {
+    const res = await fetch('/analyze/manual', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (json.success) renderResults(json.result);
+    else showError(json.error || 'Analysis failed');
+  } catch(e) { showError('Server unreachable. Is Flask running?'); }
+  hideLoader();
+}
+
+async function analyzeFile(type) {
+  const input = document.getElementById(type + 'File');
+  if (!input.files[0]) { showError('Please select a file first.'); return; }
+  const form = new FormData();
+  form.append('file', input.files[0]);
+  showLoader();
+  try {
+    const res = await fetch('/analyze/' + type, { method: 'POST', body: form });
+    const json = await res.json();
+    if (json.success) renderResults(json.result);
+    else showError(json.error || 'Analysis failed');
+  } catch(e) { showError('Server unreachable. Is Flask running?'); }
+  hideLoader();
+}
+
+function showLoader() {
+  document.getElementById('loader').classList.add('show');
+  document.getElementById('results').classList.remove('show');
+  hideResults();
+}
+function hideLoader() { document.getElementById('loader').classList.remove('show'); }
+
+function renderResults(r) {
+  const risk = r.overall_risk || 'LOW';
+  const urgency = r.urgency || 'ROUTINE';
+  const preds = r.ml_predictions || {};
+  const major = r.major_risks || [];
+  const minor = r.minor_risks || [];
+  const recs = r.recommendations || [];
+  const summary = r.summary || '';
+  const consult = r.doctor_consultation || 'NO';
+  const abnormal = r.abnormal_values || [];
+
+  let predsHTML = '';
+  for (const [disease, val] of Object.entries(preds)) {
+    const detected = val.status === 'Detected';
+    const conf = val.confidence || 0;
+    predsHTML += `
+      <div class="pred-card ${detected ? 'detected' : 'safe'}">
+        <div class="pred-name">${disease}</div>
+        <div class="pred-status">${detected ? '⚠ ' + val.status : '✓ ' + val.status}</div>
+        <div class="confidence-bar"><div class="confidence-fill" style="width:${conf}%"></div></div>
+        <div class="confidence-text">${conf}% confidence</div>
+      </div>`;
+  }
+
+  const majorHTML = major.length ? major.map(r => `<li>${r}</li>`).join('') : '<li>None identified</li>';
+  const minorHTML = minor.length ? minor.map(r => `<li>${r}</li>`).join('') : '<li>None significant</li>';
+  const recsHTML = recs.length ? recs.map(r => `<li>${r}</li>`).join('') : '<li>Continue routine health monitoring</li>';
+  const abnormalHTML = abnormal.length ? abnormal.map(r => `<li>${r}</li>`).join('') : '<li>No critical abnormalities flagged</li>';
+
+  document.getElementById('results').innerHTML = `
+    <div class="risk-banner ${risk}">
+      <div>
+        <div class="risk-label">Overall Risk Level</div>
+        <div class="risk-value">${risk}</div>
+      </div>
+      <span class="urgency-chip urgency-${urgency}">${urgency} ATTENTION</span>
+    </div>
+
+    <div class="section-label">ML Model Predictions</div>
+    <div class="predictions-grid">${predsHTML}</div>
+
+    ${summary ? `<div class="summary-card"><h3>Clinical Summary</h3><p>${summary}</p></div>` : ''}
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>⚠ Major Risks</h3>
+        <ul class="risks-major">${majorHTML}</ul>
+      </div>
+      <div class="info-card">
+        <h3>~ Minor Risks</h3>
+        <ul class="risks-minor">${minorHTML}</ul>
+      </div>
+      <div class="info-card">
+        <h3>✓ Recommendations</h3>
+        <ul class="recommendations">${recsHTML}</ul>
+      </div>
+      <div class="info-card">
+        <h3>📊 Abnormal Values</h3>
+        <ul class="risks-minor">${abnormalHTML}</ul>
+      </div>
+    </div>
+
+    <div class="doctor-card doctor-${consult}">
+      <div class="doctor-icon">${consult === 'YES' ? '🏥' : '✅'}</div>
+      <div>
+        <div class="doctor-text">${consult === 'YES' ? 'Doctor Consultation Recommended' : 'No Immediate Consultation Required'}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('results').classList.add('show');
+}
+</script>
+</body>
+</html>
