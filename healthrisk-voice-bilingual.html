@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthRisk AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--surface:#111;--surface2:#171717;
+  --border:rgba(255,255,255,.07);--border-lit:rgba(255,255,255,.14);
+  --text:#f0f0f0;--muted:#666;--dim:#333;
+  --green:#00e676;--green-dim:rgba(0,230,118,.08);--green-border:rgba(0,230,118,.2);
+  --amber:#ffc107;--amber-dim:rgba(255,193,7,.08);--amber-border:rgba(255,193,7,.2);
+  --red:#ff5252;--red-dim:rgba(255,82,82,.08);--red-border:rgba(255,82,82,.2);
+  --blue:#60a5fa;--blue-dim:rgba(96,165,250,.08);--blue-border:rgba(96,165,250,.2);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,.08);--purple-border:rgba(167,139,250,.2);
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:3px}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.telugu-font{font-family:'Noto Sans Telugu',sans-serif}
+.page{max-width:700px;margin:0 auto;padding:48px 20px 140px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.a1{opacity:0;animation:fadeUp .6s ease .05s forwards}
+.a2{opacity:0;animation:fadeUp .6s ease .15s forwards}
+.a3{opacity:0;animation:fadeUp .6s ease .25s forwards}
+.a4{opacity:0;animation:fadeUp .6s ease .35s forwards}
+.a5{opacity:0;animation:fadeUp .6s ease .45s forwards}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:44px;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-box{width:40px;height:40px;border:1px solid var(--border-lit);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--surface)}
+.logo-name{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.offline-tag{display:flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);letter-spacing:1px;text-transform:uppercase;border:1px solid var(--green-border);border-radius:99px;padding:5px 12px;background:var(--green-dim)}
+.tag-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:tagPulse 2.5s ease-in-out infinite}
+@keyframes tagPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,230,118,.5)}50%{opacity:.6;box-shadow:0 0 0 4px rgba(0,230,118,0)}}
+
+/* LANGUAGE TOGGLE */
+.lang-toggle{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-lit);border-radius:99px;padding:3px;gap:2px}
+.lang-btn{padding:5px 14px;border-radius:99px;border:none;background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.lang-btn.active{background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple-border)}
+.lang-btn.active.telugu-font{font-family:'Noto Sans Telugu',sans-serif;font-size:12px}
+
+/* HERO */
+.hero{margin-bottom:32px}
+.hero h1{font-size:clamp(22px,4vw,32px);font-weight:700;letter-spacing:-.8px;line-height:1.15;margin-bottom:10px}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{font-size:14px;color:var(--muted);line-height:1.8;max-width:440px}
+
+/* STEPS */
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:28px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;text-align:center;transition:border-color .2s}
+.step:hover{border-color:var(--border-lit)}
+.step-n{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:1px}
+.step-icon{font-size:20px;margin-bottom:8px}
+.step-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.step-desc{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+.divider{height:1px;background:var(--border);margin:28px 0}
+.sec-title{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px}
+
+/* UPLOAD */
+.upload-zone{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px;position:relative;transition:border-color .3s}
+.upload-zone.over{border-color:var(--green)}
+.upload-zone.scanning{border-color:rgba(0,230,118,.4)}
+.scanner-frame{position:relative;padding:44px 24px 36px;cursor:pointer;text-align:center;overflow:hidden}
+.scanner-frame input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.corner{position:absolute;width:18px;height:18px;border-color:var(--dim);border-style:solid;transition:border-color .3s}
+.corner-tl{top:12px;left:12px;border-width:2px 0 0 2px}
+.corner-tr{top:12px;right:12px;border-width:2px 2px 0 0}
+.corner-bl{bottom:12px;left:12px;border-width:0 0 2px 2px}
+.corner-br{bottom:12px;right:12px;border-width:0 2px 2px 0}
+.upload-zone.over .corner,.upload-zone.scanning .corner,.upload-zone:hover .corner{border-color:var(--green)}
+.scan-line{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green) 30%,rgba(0,230,118,.6) 50%,var(--green) 70%,transparent);box-shadow:0 0 8px rgba(0,230,118,.6),0 0 20px rgba(0,230,118,.2);opacity:0;top:0;transition:opacity .3s;pointer-events:none}
+.scan-line::after{content:'';position:absolute;left:0;right:0;top:-8px;height:16px;background:linear-gradient(180deg,transparent,rgba(0,230,118,.06),transparent)}
+.upload-zone:hover .scan-line,.upload-zone.over .scan-line{opacity:1;animation:scanIdle 3s ease-in-out infinite}
+.upload-zone.scanning .scan-line{opacity:1;animation:scanFast .8s linear infinite}
+@keyframes scanIdle{0%{top:12px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 12px);opacity:0}}
+@keyframes scanFast{0%{top:0}100%{top:100%}}
+.scan-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,230,118,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,.03) 1px,transparent 1px);background-size:24px 24px;opacity:0;pointer-events:none;transition:opacity .4s}
+.upload-zone.scanning .scan-grid{opacity:1}
+.upload-content{position:relative;z-index:1}
+.upload-icon-wrap{width:56px;height:56px;margin:0 auto 16px;border:1px solid var(--border-lit);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--surface2);transition:all .3s}
+.upload-zone:hover .upload-icon-wrap{border-color:var(--green);box-shadow:0 0 16px rgba(0,230,118,.15)}
+.upload-main{font-size:15px;font-weight:600;margin-bottom:5px}
+.upload-sub{font-size:13px;color:var(--muted)}
+.file-formats{display:flex;justify-content:center;gap:6px;margin-top:16px;flex-wrap:wrap}
+.fmt-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 9px;border:1px solid var(--border);border-radius:4px;color:var(--dim);letter-spacing:.5px}
+.file-chosen{display:none;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--border);background:var(--green-dim)}
+.file-chosen.show{display:flex}
+.fc-icon{font-size:18px}
+.fc-name{flex:1;font-size:13px;font-weight:600;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-size{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0}
+.fc-remove{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;transition:color .2s;padding:2px 6px}
+.fc-remove:hover{color:var(--red)}
+.privacy-note{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:14px}
+.privacy-note span{color:var(--green)}
+
+.btn-run{width:100%;padding:15px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.btn-run:hover{background:#e0e0e0;transform:translateY(-1px)}
+.btn-run:active{transform:translateY(0)}
+.btn-run:disabled{background:var(--dim);color:var(--muted);cursor:not-allowed;transform:none}
+
+/* PROCESSING */
+.processing{display:none;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 24px;text-align:center;margin-bottom:12px}
+.processing.show{display:block;animation:fadeUp .4s ease forwards}
+.proc-rings{position:relative;width:72px;height:72px;margin:0 auto 20px}
+.proc-ring{position:absolute;border-radius:50%;border:1.5px solid transparent}
+.proc-ring:nth-child(1){inset:0;border-top-color:var(--green);animation:spin 1s linear infinite}
+.proc-ring:nth-child(2){inset:10px;border-right-color:rgba(0,230,118,.4);animation:spin 1.6s linear infinite reverse}
+.proc-ring:nth-child(3){inset:20px;border-bottom-color:rgba(0,230,118,.2);animation:spin 2.2s linear infinite}
+.proc-center{position:absolute;inset:30px;display:flex;align-items:center;justify-content:center;font-size:11px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.proc-title{font-size:15px;font-weight:600;margin-bottom:6px}
+.proc-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.proc-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;max-width:260px;margin:0 auto 18px}
+.proc-bar-fill{height:100%;background:var(--green);box-shadow:0 0 8px rgba(0,230,118,.6);width:0;border-radius:2px;animation:barFill 2.8s ease-out forwards}
+@keyframes barFill{to{width:88%}}
+.proc-steps{display:flex;flex-direction:column;gap:7px;max-width:240px;margin:0 auto}
+.proc-step{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);opacity:0;animation:fadeUp .4s ease forwards;text-align:left}
+.ps-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 5px rgba(0,230,118,.5)}
+
+/* RESULTS */
+.results{display:none}
+.results.show{display:block;animation:fadeUp .5s ease forwards}
+.risk-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;transition:border-color .2s,transform .2s}
+.rcard:hover{transform:translateY(-2px)}
+.rcard.good{border-bottom:2px solid rgba(0,230,118,.4)}
+.rcard.warn{border-bottom:2px solid rgba(255,193,7,.4)}
+.rcard.bad{border-bottom:2px solid rgba(255,82,82,.4)}
+.rc-ico{font-size:20px;margin-bottom:8px}
+.rc-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.rc-val{font-size:20px;font-weight:700;line-height:1;margin-bottom:4px}
+.rcard.good .rc-val{color:var(--green)}
+.rcard.warn .rc-val{color:var(--amber)}
+.rcard.bad  .rc-val{color:var(--red)}
+.rc-note{font-size:11px;color:var(--muted);line-height:1.4}
+.rc-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:12px}
+.rc-fill{height:100%;border-radius:2px;width:0;transition:width 1s ease .4s}
+.rcard.good .rc-fill{background:var(--green)}
+.rcard.warn .rc-fill{background:var(--amber)}
+.rcard.bad  .rc-fill{background:var(--red)}
+.vitals-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.vcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;transition:border-color .2s}
+.vcard:hover{border-color:var(--border-lit)}
+.vc-ico{font-size:16px;margin-bottom:6px}
+.vc-val{font-size:14px;font-weight:700;line-height:1;margin-bottom:4px}
+.vc-lbl{font-size:10px;color:var(--muted);letter-spacing:.5px}
+
+/* DIAGNOSIS PANEL */
+.diagnosis-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.dp-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.dp-head-left{display:flex;align-items:center;gap:10px}
+.dp-head-icon{font-size:18px}
+.dp-head-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.dp-head-actions{display:flex;align-items:center;gap:8px}
+.dp-speak-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--surface2);border:1px solid var(--border-lit);border-radius:6px;color:var(--text);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.dp-speak-btn:hover{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue)}
+.dp-speak-btn.speaking{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue);animation:speakPulse .7s ease-in-out infinite}
+@keyframes speakPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.dp-body{padding:20px}
+.disease-list{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.disease-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s}
+.disease-item:hover{border-color:var(--border-lit)}
+.disease-item.critical{border-left:3px solid var(--red)}
+.disease-item.warning{border-left:3px solid var(--amber)}
+.disease-item.normal{border-left:3px solid var(--green)}
+.di-badge{flex-shrink:0;padding:3px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.disease-item.critical .di-badge{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+.disease-item.warning  .di-badge{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
+.disease-item.normal   .di-badge{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.di-content{flex:1}
+.di-name{font-size:14px;font-weight:600;margin-bottom:4px}
+.di-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+.di-translation{font-family:'Noto Sans Telugu',sans-serif;font-size:12.5px;color:var(--purple);line-height:1.6;margin-top:5px;padding-top:5px;border-top:1px solid var(--border);display:none}
+.di-translation.show{display:block}
+.di-indicators{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.di-ind{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:2px 7px;background:var(--surface);border:1px solid var(--border);border-radius:3px;color:var(--dim)}
+.ap-text{font-size:13px;color:#888;line-height:1.8}
+
+/* DOCTOR SUGGESTIONS */
+.doctors-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.doctors-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.doctors-head-icon{font-size:18px}
+.doctors-head-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);flex:1}
+.doctors-count{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green)}
+.doctors-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px}
+.doc-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:flex-start;transition:all .2s}
+.doc-card:hover{border-color:var(--border-lit);transform:translateY(-1px)}
+.doc-avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--surface),#222);border:1px solid var(--border-lit);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-size:13px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-spec{font-size:11px;color:var(--green);font-weight:500;margin-bottom:4px}
+.doc-spec-tel{font-family:'Noto Sans Telugu',sans-serif;font-size:10px;color:var(--purple);margin-bottom:4px;display:none}
+.doc-spec-tel.show{display:block}
+.doc-detail{font-size:11px;color:var(--muted);line-height:1.5}
+.doc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.doc-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:3px;color:var(--dim)}
+.doc-match{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--amber);background:var(--amber-dim);border:1px solid var(--amber-border);padding:2px 7px;border-radius:3px;display:inline-flex;align-items:center;gap:4px;margin-top:6px}
+
+/* CHAT */
+.chat-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:10px}
+.chat-head{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.chat-head::before{content:'//';color:var(--dim)}
+.quick-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.qb{font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.qb:hover{border-color:var(--border-lit);color:var(--text)}
+.chat-messages{min-height:60px;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.msg{max-width:86%;padding:10px 14px;border-radius:12px;font-size:13.5px;line-height:1.7;animation:fadeUp .3s ease forwards}
+.msg.user{align-self:flex-end;background:var(--text);color:var(--bg);border-radius:12px 12px 3px 12px;font-weight:500}
+.msg.ai{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);color:#bbb;border-radius:12px 12px 12px 3px}
+.msg.typing{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:12px 12px 12px 3px;padding:14px 16px}
+.dots{display:flex;gap:5px}
+.dots span{width:6px;height:6px;background:var(--dim);border-radius:50%;animation:dj 1.1s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+@keyframes dj{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px);background:var(--muted)}}
+.chat-empty{text-align:center;padding:16px;font-size:12.5px;color:var(--dim);font-family:'IBM Plex Mono',monospace}
+.input-row{display:flex;gap:8px}
+.chat-input{flex:1;padding:11px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px;color:var(--text);outline:none;transition:border-color .2s}
+.chat-input:focus{border-color:var(--border-lit)}
+.chat-input::placeholder{color:var(--dim)}
+.btn-mic{padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:15px;transition:all .2s;flex-shrink:0}
+.btn-mic:hover{border-color:var(--border-lit);color:var(--text)}
+.btn-mic.active{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.btn-send{padding:11px 18px;background:var(--surface2);border:1px solid var(--border-lit);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-send:hover{background:var(--text);color:var(--bg)}
+.btn-send:disabled{opacity:.3;cursor:not-allowed}
+
+/* ══════════════════════════════
+   VOICE MODE OVERLAY
+══════════════════════════════ */
+.voice-mode-overlay{position:fixed;inset:0;background:rgba(5,5,5,.97);backdrop-filter:blur(12px);z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:24px}
+.voice-mode-overlay.open{display:flex;animation:fadeUp .3s ease forwards}
+
+.vm-close{position:absolute;top:20px;right:20px;background:var(--surface);border:1px solid var(--border-lit);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--muted);transition:all .2s}
+.vm-close:hover{color:var(--text);border-color:var(--red);background:var(--red-dim)}
+
+.vm-lang-switch{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-lit);border-radius:99px;padding:4px;gap:2px;margin-bottom:28px}
+.vm-lang-btn{padding:8px 22px;border-radius:99px;border:none;background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;white-space:nowrap}
+.vm-lang-btn.active{background:var(--purple);color:#fff;box-shadow:0 0 16px rgba(167,139,250,.4)}
+.vm-lang-btn.tel.active{font-family:'Noto Sans Telugu',sans-serif;font-size:13px}
+
+.vm-title{font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+
+/* Orb */
+.vm-orb-wrap{position:relative;width:180px;height:180px;margin-bottom:28px}
+.vm-orb{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(0,230,118,.15),rgba(0,230,118,.03));border:1px solid var(--green-border);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:32px;transition:all .3s}
+.vm-orb.listening{background:radial-gradient(circle at 40% 35%,rgba(0,230,118,.25),rgba(0,230,118,.05));border-color:var(--green);box-shadow:0 0 40px rgba(0,230,118,.25),0 0 80px rgba(0,230,118,.1);animation:orbPulse 1s ease-in-out infinite}
+.vm-orb.speaking{background:radial-gradient(circle at 40% 35%,rgba(96,165,250,.25),rgba(96,165,250,.05));border-color:var(--blue);box-shadow:0 0 40px rgba(96,165,250,.25),0 0 80px rgba(96,165,250,.1);animation:orbPulse .7s ease-in-out infinite}
+.vm-orb.processing{background:radial-gradient(circle at 40% 35%,rgba(255,193,7,.2),rgba(255,193,7,.04));border-color:var(--amber);box-shadow:0 0 30px rgba(255,193,7,.2);animation:none}
+@keyframes orbPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.07)}}
+/* Ring waves around orb */
+.vm-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid;transform:translate(-50%,-50%);opacity:0}
+.vm-ring-1{width:140px;height:140px;border-color:rgba(0,230,118,.3)}
+.vm-ring-2{width:165px;height:165px;border-color:rgba(0,230,118,.15)}
+.vm-ring-3{width:180px;height:180px;border-color:rgba(0,230,118,.07)}
+.vm-orb.listening ~ .vm-ring-1,.vm-orb.speaking ~ .vm-ring-1{animation:ringPulse 1.5s ease-out infinite}
+.vm-orb.listening ~ .vm-ring-2,.vm-orb.speaking ~ .vm-ring-2{animation:ringPulse 1.5s ease-out .3s infinite}
+.vm-orb.listening ~ .vm-ring-3,.vm-orb.speaking ~ .vm-ring-3{animation:ringPulse 1.5s ease-out .6s infinite}
+@keyframes ringPulse{0%{opacity:.8;transform:translate(-50%,-50%) scale(.9)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
+
+/* Waveform */
+.vm-wave{display:flex;align-items:center;justify-content:center;gap:3px;height:36px;margin-bottom:16px}
+.vm-bar{width:3px;border-radius:3px;background:var(--dim);transition:background .2s}
+.vm-wave.active .vm-bar{background:var(--green)}
+.vm-wave.speaking .vm-bar{background:var(--blue)}
+.vm-wave.active  .vm-bar:nth-child(1){animation:wA .8s ease-in-out infinite .00s}
+.vm-wave.active  .vm-bar:nth-child(2){animation:wA .8s ease-in-out infinite .07s}
+.vm-wave.active  .vm-bar:nth-child(3){animation:wA .8s ease-in-out infinite .14s}
+.vm-wave.active  .vm-bar:nth-child(4){animation:wA .8s ease-in-out infinite .21s}
+.vm-wave.active  .vm-bar:nth-child(5){animation:wA .8s ease-in-out infinite .28s}
+.vm-wave.active  .vm-bar:nth-child(6){animation:wA .8s ease-in-out infinite .35s}
+.vm-wave.active  .vm-bar:nth-child(7){animation:wA .8s ease-in-out infinite .28s}
+.vm-wave.active  .vm-bar:nth-child(8){animation:wA .8s ease-in-out infinite .21s}
+.vm-wave.active  .vm-bar:nth-child(9){animation:wA .8s ease-in-out infinite .14s}
+.vm-wave.active  .vm-bar:nth-child(10){animation:wA .8s ease-in-out infinite .07s}
+.vm-wave.active  .vm-bar:nth-child(11){animation:wA .8s ease-in-out infinite .00s}
+.vm-wave.speaking .vm-bar:nth-child(1){animation:wA .5s ease-in-out infinite .00s}
+.vm-wave.speaking .vm-bar:nth-child(2){animation:wA .5s ease-in-out infinite .05s}
+.vm-wave.speaking .vm-bar:nth-child(3){animation:wA .5s ease-in-out infinite .10s}
+.vm-wave.speaking .vm-bar:nth-child(4){animation:wA .5s ease-in-out infinite .15s}
+.vm-wave.speaking .vm-bar:nth-child(5){animation:wA .5s ease-in-out infinite .20s}
+.vm-wave.speaking .vm-bar:nth-child(6){animation:wA .5s ease-in-out infinite .25s}
+.vm-wave.speaking .vm-bar:nth-child(7){animation:wA .5s ease-in-out infinite .20s}
+.vm-wave.speaking .vm-bar:nth-child(8){animation:wA .5s ease-in-out infinite .15s}
+.vm-wave.speaking .vm-bar:nth-child(9){animation:wA .5s ease-in-out infinite .10s}
+.vm-wave.speaking .vm-bar:nth-child(10){animation:wA .5s ease-in-out infinite .05s}
+.vm-wave.speaking .vm-bar:nth-child(11){animation:wA .5s ease-in-out infinite .00s}
+@keyframes wA{0%,100%{height:4px}50%{height:24px}}
+.vm-bar:nth-child(1){height:5px}.vm-bar:nth-child(2){height:10px}.vm-bar:nth-child(3){height:18px}.vm-bar:nth-child(4){height:24px}.vm-bar:nth-child(5){height:18px}.vm-bar:nth-child(6){height:28px}.vm-bar:nth-child(7){height:18px}.vm-bar:nth-child(8){height:24px}.vm-bar:nth-child(9){height:18px}.vm-bar:nth-child(10){height:10px}.vm-bar:nth-child(11){height:5px}
+
+.vm-status{font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;text-align:center}
+.vm-status.telugu{font-family:'Noto Sans Telugu',sans-serif;font-size:17px}
+.vm-transcript{font-size:13px;color:var(--muted);font-style:italic;min-height:20px;text-align:center;margin-bottom:24px;padding:0 16px;line-height:1.6;max-width:360px}
+
+.vm-mic-btn{width:64px;height:64px;border-radius:50%;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:26px;transition:all .25s;box-shadow:0 0 24px rgba(0,230,118,.4);margin-bottom:28px}
+.vm-mic-btn:hover{transform:scale(1.07);box-shadow:0 0 36px rgba(0,230,118,.55)}
+.vm-mic-btn.listening{background:var(--red);box-shadow:0 0 24px rgba(255,82,82,.5);animation:micPulse 1s ease-in-out infinite}
+.vm-mic-btn.speaking{background:var(--blue);box-shadow:0 0 24px rgba(96,165,250,.5)}
+@keyframes micPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+.vm-commands{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:480px}
+.vm-cmd-chip{padding:7px 14px;background:var(--surface);border:1px solid var(--border-lit);border-radius:99px;font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s}
+.vm-cmd-chip:hover{border-color:var(--green);color:var(--green)}
+.vm-cmd-chip.tel{font-family:'Noto Sans Telugu',sans-serif;font-size:11px}
+
+/* VOICE MODE BUTTON in main UI */
+.voice-mode-btn{display:flex;align-items:center;gap:10px;width:100%;padding:16px 20px;background:var(--surface);border:1px solid var(--border-lit);border-radius:12px;cursor:pointer;transition:all .25s;margin-bottom:16px;position:relative;overflow:hidden}
+.voice-mode-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,230,118,.04),transparent);transform:translateX(-100%);transition:transform .5s}
+.voice-mode-btn:hover::before{transform:translateX(100%)}
+.voice-mode-btn:hover{border-color:var(--green);box-shadow:0 0 20px rgba(0,230,118,.1)}
+.vmb-icon{width:44px;height:44px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.vmb-text{flex:1;text-align:left}
+.vmb-title{font-size:15px;font-weight:700;margin-bottom:3px}
+.vmb-sub{font-size:12px;color:var(--muted)}
+.vmb-arrow{font-size:18px;color:var(--muted);transition:transform .2s}
+.voice-mode-btn:hover .vmb-arrow{transform:translateX(3px);color:var(--green)}
+
+/* FOOTER */
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--dim);font-family:'IBM Plex Mono',monospace;letter-spacing:.3px}
+
+@media(max-width:600px){
+  .steps,.risk-row{grid-template-columns:1fr}
+  .vitals-row,.doctors-grid{grid-template-columns:1fr 1fr}
+  header{flex-direction:column;align-items:flex-start}
+  footer{flex-direction:column;gap:8px;text-align:center}
+  .vm-commands{max-width:300px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header class="a1">
+    <div class="logo">
+      <div class="logo-box">🏥</div>
+      <div>
+        <div class="logo-name">HealthRisk AI</div>
+        <div class="logo-sub">Early Detection System</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <!-- Language Toggle -->
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="langEn" onclick="setLang('en')">English</button>
+        <button class="lang-btn telugu-font" id="langTe" onclick="setLang('te')">తెలుగు</button>
+      </div>
+      <div class="offline-tag"><span class="tag-dot"></span>Offline Ready</div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero a2">
+    <h1 id="heroTitle">Detect health risks<br><em>before</em> they escalate.</h1>
+    <p id="heroSub">Upload your medical report. AI detects conditions, suggests relevant doctors, and reads results aloud — in English or Telugu.</p>
+  </div>
+
+  <!-- Steps -->
+  <div class="sec-title a3" id="howLabel">How it works</div>
+  <div class="steps a3">
+    <div class="step"><div class="step-n">01</div><div class="step-icon">📄</div><div class="step-title" id="s1t">Upload Report</div><div class="step-desc" id="s1d">CSV, PDF, image or text</div></div>
+    <div class="step"><div class="step-n">02</div><div class="step-icon">🔬</div><div class="step-title" id="s2t">AI Diagnoses</div><div class="step-desc" id="s2d">Detects diseases & conditions</div></div>
+    <div class="step"><div class="step-n">03</div><div class="step-icon">🩺</div><div class="step-title" id="s3t">Get Doctors</div><div class="step-desc" id="s3d">Matched specialists suggested</div></div>
+  </div>
+
+  <div class="divider a3"></div>
+
+  <!-- Voice Mode Button -->
+  <div class="a4">
+    <button class="voice-mode-btn" onclick="openVoiceMode()">
+      <div class="vmb-icon">🎙️</div>
+      <div class="vmb-text">
+        <div class="vmb-title" id="vmBtnTitle">Voice Mode</div>
+        <div class="vmb-sub" id="vmBtnSub">Speak to analyse, ask questions & hear results in English or Telugu</div>
+      </div>
+      <div class="vmb-arrow">→</div>
+    </button>
+  </div>
+
+  <!-- Upload -->
+  <div class="sec-title a4" id="uploadLabel">Upload your health report</div>
+  <div class="upload-zone a4" id="uploadZone">
+    <div class="scan-line"></div><div class="scan-grid"></div>
+    <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+    <div class="scanner-frame">
+      <input type="file" id="fileInput" accept=".csv,.pdf,.jpg,.jpeg,.png,.txt">
+      <div class="upload-content">
+        <div class="upload-icon-wrap">📂</div>
+        <div class="upload-main" id="uploadMain">Click to choose a file, or drag & drop</div>
+        <div class="upload-sub" id="uploadSub">Hover to preview the scanner</div>
+        <div class="file-formats">
+          <span class="fmt-tag">CSV</span><span class="fmt-tag">PDF</span>
+          <span class="fmt-tag">JPG</span><span class="fmt-tag">PNG</span><span class="fmt-tag">TXT</span>
+        </div>
+      </div>
+    </div>
+    <div class="file-chosen" id="fileChosen">
+      <span class="fc-icon">✅</span>
+      <span class="fc-name" id="fcName">—</span>
+      <span class="fc-size" id="fcSize">—</span>
+      <button class="fc-remove" id="fcRemove">✕</button>
+    </div>
+  </div>
+  <p class="privacy-note a4"><span>🔒</span> <span id="privacyTxt">Your file is processed entirely on this device. Nothing is sent to any server.</span></p>
+  <button class="btn-run a4" id="runBtn" onclick="runAnalysis()">⬡ &nbsp;<span id="runBtnTxt">Analyse My Report</span></button>
+
+  <!-- Processing -->
+  <div class="processing" id="processing">
+    <div class="proc-rings"><div class="proc-ring"></div><div class="proc-ring"></div><div class="proc-ring"></div><div class="proc-center">🧬</div></div>
+    <div class="proc-title" id="procTitle">Scanning your report…</div>
+    <div class="proc-sub" id="procSub">Usually under 30 seconds</div>
+    <div class="proc-bar"><div class="proc-bar-fill" id="procFill"></div></div>
+    <div class="proc-steps" id="procSteps"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results">
+    <div class="divider"></div>
+    <div class="sec-title" id="riskLabel">Risk Overview</div>
+    <div class="risk-row">
+      <div class="rcard good" id="rc1"><div class="rc-ico">🫀</div><div class="rc-lbl" id="rc1lbl">Cardiovascular</div><div class="rc-val" id="rv1">—</div><div class="rc-note" id="rn1">Awaiting</div><div class="rc-bar"><div class="rc-fill" id="rb1"></div></div></div>
+      <div class="rcard warn" id="rc2"><div class="rc-ico">🧬</div><div class="rc-lbl" id="rc2lbl">Metabolic</div><div class="rc-val" id="rv2">—</div><div class="rc-note" id="rn2">Awaiting</div><div class="rc-bar"><div class="rc-fill" id="rb2"></div></div></div>
+      <div class="rcard bad"  id="rc3"><div class="rc-ico">⚡</div><div class="rc-lbl" id="rc3lbl">Overall Risk</div><div class="rc-val" id="rv3">—</div><div class="rc-note" id="rn3">Awaiting</div><div class="rc-bar"><div class="rc-fill" id="rb3"></div></div></div>
+    </div>
+    <div class="sec-title" id="vitalsLabel" style="margin-top:20px">Key Vitals</div>
+    <div class="vitals-row">
+      <div class="vcard"><div class="vc-ico">❤️</div><div class="vc-val" id="vBP">—</div><div class="vc-lbl" id="vlBP">Blood Pressure</div></div>
+      <div class="vcard"><div class="vc-ico">🩸</div><div class="vc-val" id="vGL">—</div><div class="vc-lbl" id="vlGL">Glucose</div></div>
+      <div class="vcard"><div class="vc-ico">⚖️</div><div class="vc-val" id="vBM">—</div><div class="vc-lbl" id="vlBM">BMI</div></div>
+      <div class="vcard"><div class="vc-ico">🫀</div><div class="vc-val" id="vHR">—</div><div class="vc-lbl" id="vlHR">Heart Rate</div></div>
+    </div>
+
+    <!-- Diagnosis -->
+    <div class="sec-title" id="condLabel" style="margin-top:20px">Detected Conditions</div>
+    <div class="diagnosis-panel">
+      <div class="dp-head">
+        <div class="dp-head-left"><span class="dp-head-icon">🔍</span><span class="dp-head-title" id="diagHeadTxt">Diagnosis Report</span></div>
+        <div class="dp-head-actions">
+          <button class="dp-speak-btn" id="speakDiagBtn" onclick="speakDiagnosis()">
+            <span id="speakDiagIcon">🔊</span><span id="speakDiagLabel">Read Aloud</span>
+          </button>
+        </div>
+      </div>
+      <div class="dp-body">
+        <div class="disease-list" id="diseaseList"></div>
+        <div class="ap-text" id="apText">—</div>
+      </div>
+    </div>
+
+    <!-- Doctors -->
+    <div class="sec-title" id="docLabel" style="margin-top:20px">Recommended Doctors</div>
+    <div class="doctors-panel">
+      <div class="doctors-head">
+        <span class="doctors-head-icon">🩺</span>
+        <span class="doctors-head-title" id="docHeadTxt">Specialist Suggestions</span>
+        <span class="doctors-count" id="doctorsCount">0 matched</span>
+      </div>
+      <div class="doctors-grid" id="doctorsGrid"></div>
+    </div>
+
+    <!-- Chat -->
+    <div class="sec-title" id="chatLabel" style="margin-top:20px">Ask the Assistant</div>
+    <div class="chat-panel">
+      <div class="chat-head" id="chatHeadTxt">AI Health Assistant</div>
+      <div class="quick-row" id="quickRow">
+        <button class="qb" onclick="ask('What diseases were detected?')">🔍 Diseases found</button>
+        <button class="qb" onclick="ask('What are my main risk factors?')">⚡ Main risks</button>
+        <button class="qb" onclick="ask('Which doctor should I see first?')">🏥 Which doctor?</button>
+        <button class="qb" onclick="ask('What lifestyle changes help?')">🥗 Lifestyle tips</button>
+      </div>
+      <div class="chat-messages" id="chatMsgs">
+        <div class="chat-empty" id="chatEmptyTxt">// upload a report to start asking questions</div>
+      </div>
+      <div class="input-row">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Ask anything…" onkeydown="if(event.key==='Enter') sendChat()">
+        <button class="btn-mic" id="inlineMicBtn" onclick="openVoiceMode()" title="Voice Mode">🎙️</button>
+        <button class="btn-send" id="sendBtn" onclick="sendChat()"><span id="sendTxt">Send →</span></button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="a5">
+    <span id="footerL">// not medical advice — consult a doctor</span>
+    <span>SHORe' 2026 · AIML Track</span>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     VOICE MODE OVERLAY
+══════════════════════════════════════ -->
+<div class="voice-mode-overlay" id="voiceModeOverlay">
+  <button class="vm-close" onclick="closeVoiceMode()">✕</button>
+
+  <!-- Language switcher inside voice mode -->
+  <div class="vm-lang-switch">
+    <button class="vm-lang-btn active" id="vmLangEn" onclick="setLang('en')">English</button>
+    <button class="vm-lang-btn tel" id="vmLangTe" onclick="setLang('te')">తెలుగు</button>
+  </div>
+
+  <div class="vm-title" id="vmTitle">// VOICE MODE</div>
+
+  <!-- Animated orb -->
+  <div class="vm-orb-wrap">
+    <div class="vm-orb" id="vmOrb">🎙️</div>
+    <div class="vm-ring vm-ring-1"></div>
+    <div class="vm-ring vm-ring-2"></div>
+    <div class="vm-ring vm-ring-3"></div>
+  </div>
+
+  <!-- Waveform -->
+  <div class="vm-wave" id="vmWave">
+    <div class="vm-bar"></div><div class="vm-bar"></div><div class="vm-bar"></div>
+    <div class="vm-bar"></div><div class="vm-bar"></div><div class="vm-bar"></div>
+    <div class="vm-bar"></div><div class="vm-bar"></div><div class="vm-bar"></div>
+    <div class="vm-bar"></div><div class="vm-bar"></div>
+  </div>
+
+  <div class="vm-status" id="vmStatus">Tap mic to speak</div>
+  <div class="vm-transcript" id="vmTranscript"></div>
+
+  <button class="vm-mic-btn" id="vmMicBtn" onclick="toggleVoice()">🎙️</button>
+
+  <!-- Quick commands -->
+  <div class="vm-commands" id="vmCmds"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// LANGUAGE SYSTEM
+// ═══════════════════════════════════════════════
+let currentLang = 'en';
+
+const T = {
+  en: {
+    heroTitle: 'Detect health risks<br><em>before</em> they escalate.',
+    heroSub: 'Upload your medical report. AI detects conditions, suggests relevant doctors, and reads results aloud — in English or Telugu.',
+    howLabel: 'How it works',
+    s1t:'Upload Report', s1d:'CSV, PDF, image or text',
+    s2t:'AI Diagnoses',  s2d:'Detects diseases & conditions',
+    s3t:'Get Doctors',   s3d:'Matched specialists suggested',
+    vmBtnTitle:'Voice Mode',
+    vmBtnSub:'Speak to analyse, ask questions & hear results in English or Telugu',
+    uploadLabel:'Upload your health report',
+    uploadMain:'Click to choose a file, or drag & drop',
+    uploadSub:'Hover to preview the scanner',
+    privacyTxt:'Your file is processed entirely on this device. Nothing is sent to any server.',
+    runBtnTxt:'Analyse My Report',
+    procTitle:'Scanning your report…', procSub:'Usually under 30 seconds',
+    procMsgs:['Reading biomarkers…','Detecting conditions…','Matching specialists…','Generating report…'],
+    riskLabel:'Risk Overview', vitalsLabel:'Key Vitals',
+    condLabel:'Detected Conditions', docLabel:'Recommended Doctors',
+    chatLabel:'Ask the Assistant', chatHeadTxt:'AI Health Assistant',
+    chatEmptyTxt:'// upload a report to start asking questions',
+    sendTxt:'Send →', diagHeadTxt:'Diagnosis Report',
+    docHeadTxt:'Specialist Suggestions',
+    speakAloud:'Read Aloud', stopSpeaking:'Stop',
+    rc1lbl:'Cardiovascular', rc2lbl:'Metabolic', rc3lbl:'Overall Risk',
+    vlBP:'Blood Pressure', vlGL:'Glucose', vlBM:'BMI', vlHR:'Heart Rate',
+    footerL:'// not medical advice — consult a doctor',
+    vmIdleStatus:'Tap mic to speak',
+    vmListeningStatus:'Listening…',
+    vmProcessingStatus:'Processing…',
+    vmSpeakingStatus:'Speaking…',
+    vmCmds:['Analyse report','Read my diagnosis','Suggest doctors','What diseases?','Show results','Lifestyle tips','Stop speaking'],
+    // Voice strings
+    analysisComplete:'Analysis complete. I have detected conditions and matched relevant specialists. Ask me anything.',
+    noResults:'No results yet. Please upload and analyse a report first.',
+    noDiagnosis:'No conditions detected yet. Please upload and analyse a report first.',
+    noDoctors:'No doctor recommendations yet. Please analyse a report first.',
+    criticalBadge:'⚠ Critical', warningBadge:'! Warning', noteBadge:'✓ Note',
+    docMatchedLabel:'⚡ Matched to your report',
+    chatWelcome:'✅ Analysis complete! I\'ve detected conditions and matched relevant doctors. Ask me anything.',
+  },
+  te: {
+    heroTitle: 'ఆరోగ్య ప్రమాదాలను <em>ముందే</em> గుర్తించండి.',
+    heroSub: 'మీ మెడికల్ రిపోర్ట్ అప్‌లోడ్ చేయండి. AI వ్యాధులను గుర్తించి, నిపుణులను సూచిస్తుంది — తెలుగులో వినండి.',
+    howLabel: 'ఇది ఎలా పని చేస్తుంది',
+    s1t:'రిపోర్ట్ అప్‌లోడ్', s1d:'CSV, PDF, చిత్రం లేదా టెక్స్ట్',
+    s2t:'AI విశ్లేషణ',    s2d:'వ్యాధులు & పరిస్థితులు గుర్తించబడతాయి',
+    s3t:'వైద్యులు పొందండి', s3d:'మ్యాచ్ అయిన నిపుణులు సూచించబడతారు',
+    vmBtnTitle:'వాయిస్ మోడ్',
+    vmBtnSub:'విశ్లేషించడానికి మాట్లాడండి & తెలుగులో ఫలితాలు వినండి',
+    uploadLabel:'మీ ఆరోగ్య రిపోర్ట్ అప్‌లోడ్ చేయండి',
+    uploadMain:'ఫైల్ ఎంచుకోవడానికి క్లిక్ చేయండి లేదా ఇక్కడ వదలండి',
+    uploadSub:'స్కానర్ చూడటానికి హోవర్ చేయండి',
+    privacyTxt:'మీ ఫైల్ మీ పరికరంలోనే ప్రాసెస్ అవుతుంది. ఏదీ సర్వర్‌కు పంపబడదు.',
+    runBtnTxt:'నా రిపోర్ట్ విశ్లేషించు',
+    procTitle:'మీ రిపోర్ట్ స్కాన్ అవుతోంది…', procSub:'సాధారణంగా 30 సెకన్ల కంటే తక్కువ',
+    procMsgs:['బయోమార్కర్లు చదువుతోంది…','పరిస్థితులు గుర్తిస్తోంది…','నిపుణులను మ్యాచ్ చేస్తోంది…','రిపోర్ట్ తయారు చేస్తోంది…'],
+    riskLabel:'ప్రమాద సమీక్ష', vitalsLabel:'ముఖ్య వైటల్స్',
+    condLabel:'గుర్తించిన వ్యాధులు', docLabel:'సిఫారసు చేయబడిన వైద్యులు',
+    chatLabel:'సహాయకుని అడగండి', chatHeadTxt:'AI ఆరోగ్య సహాయకుడు',
+    chatEmptyTxt:'// ప్రశ్నలు అడగడానికి రిపోర్ట్ అప్‌లోడ్ చేయండి',
+    sendTxt:'పంపు →', diagHeadTxt:'రోగనిర్ధారణ నివేదిక',
+    docHeadTxt:'నిపుణుల సూచనలు',
+    speakAloud:'బిగ్గరగా చదవు', stopSpeaking:'ఆపు',
+    rc1lbl:'హృదయనాళ', rc2lbl:'జీవక్రియ', rc3lbl:'మొత్తం ప్రమాదం',
+    vlBP:'రక్తపోటు', vlGL:'గ్లూకోజ్', vlBM:'BMI', vlHR:'హృదయ స్పందన',
+    footerL:'// వైద్య సలహా కాదు — డాక్టర్‌ను సంప్రదించండి',
+    vmIdleStatus:'మాట్లాడటానికి మైక్ నొక్కండి',
+    vmListeningStatus:'వింటోంది…',
+    vmProcessingStatus:'ప్రాసెస్ అవుతోంది…',
+    vmSpeakingStatus:'మాట్లాడుతోంది…',
+    vmCmds:['రిపోర్ట్ విశ్లేషించు','నా రోగనిర్ధారణ చదువు','వైద్యులను సూచించు','వ్యాధులేమిటి?','ఫలితాలు చూపించు','జీవనశైలి చిట్కాలు','ఆపు'],
+    analysisComplete:'విశ్లేషణ పూర్తైంది. వ్యాధులు గుర్తించబడ్డాయి మరియు నిపుణులు మ్యాచ్ చేయబడ్డారు. ఏదైనా అడగండి.',
+    noResults:'ఇంకా ఫలితాలు లేవు. దయచేసి రిపోర్ట్ అప్‌లోడ్ చేసి విశ్లేషించండి.',
+    noDiagnosis:'ఇంకా పరిస్థితులు గుర్తించబడలేదు. దయచేసి రిపోర్ట్ అప్‌లోడ్ చేయండి.',
+    noDoctors:'ఇంకా వైద్య సిఫారసులు లేవు. దయచేసి రిపోర్ట్ విశ్లేషించండి.',
+    criticalBadge:'⚠ తీవ్రం', warningBadge:'! హెచ్చరిక', noteBadge:'✓ గమనిక',
+    docMatchedLabel:'⚡ మీ రిపోర్ట్‌కు మ్యాచ్ అయింది',
+    chatWelcome:'✅ విశ్లేషణ పూర్తైంది! వ్యాధులు గుర్తించబడ్డాయి మరియు వైద్యులు మ్యాచ్ అయ్యారు. అడగండి.',
+  }
+};
+
+function t(key){ return T[currentLang][key] || T.en[key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  // Header buttons
+  document.getElementById('langEn').classList.toggle('active', lang==='en');
+  document.getElementById('langTe').classList.toggle('active', lang==='te');
+  document.getElementById('vmLangEn').classList.toggle('active', lang==='en');
+  document.getElementById('vmLangTe').classList.toggle('active', lang==='te');
+  // Update all UI text
+  const keys = ['heroSub','howLabel','s1t','s1d','s2t','s2d','s3t','s3d','vmBtnTitle','vmBtnSub','uploadLabel','uploadMain','uploadSub','privacyTxt','runBtnTxt','procTitle','procSub','riskLabel','vitalsLabel','condLabel','docLabel','chatLabel','chatHeadTxt','chatEmptyTxt','sendTxt','diagHeadTxt','docHeadTxt','rc1lbl','rc2lbl','rc3lbl','vlBP','vlGL','vlBM','vlHR','footerL'];
+  keys.forEach(k => { const el=document.getElementById(k); if(el) el.innerHTML=t(k); });
+  document.getElementById('heroTitle').innerHTML = t('heroTitle');
+  // Telugu font class on telugu elements
+  document.querySelectorAll('[id]').forEach(el => {
+    if (lang === 'te') el.classList.add('apply-tel');
+    else el.classList.remove('apply-tel');
+  });
+  // Update speak button
+  document.getElementById('speakDiagLabel').textContent = t('speakAloud');
+  // Rebuild vm commands
+  renderVmCmds();
+  // Update disease translations
+  toggleTranslations();
+  // Update doctor spec translations
+  toggleDocTranslations();
+}
+
+function renderVmCmds() {
+  const cmds = t('vmCmds');
+  document.getElementById('vmCmds').innerHTML = cmds.map((c,i) =>
+    `<button class="vm-cmd-chip${currentLang==='te'?' tel':''}" onclick="quickVoiceCmd(${i})">${c}</button>`
+  ).join('');
+}
+
+function toggleTranslations() {
+  document.querySelectorAll('.di-translation').forEach(el => {
+    el.classList.toggle('show', currentLang==='te');
+  });
+}
+function toggleDocTranslations() {
+  document.querySelectorAll('.doc-spec-tel').forEach(el => {
+    el.classList.toggle('show', currentLang==='te');
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DOCTOR DATABASE
+// ═══════════════════════════════════════════════
+const DOCTOR_DB = [
+  { name:"Dr. Priya Sharma",   spec:"Cardiologist",       specTe:"హృద్రోగ నిపుణుడు",    exp:"14 yrs", hospital:"Apollo Hospitals",  avatar:"👩‍⚕️", tags:["Heart","Hypertension"],   conds:["hypertension","cardiovascular","heart","cardiac","chest pain","arrhythmia"] },
+  { name:"Dr. Arun Mehta",     spec:"Cardiologist",       specTe:"హృద్రోగ నిపుణుడు",    exp:"18 yrs", hospital:"AIIMS",             avatar:"👨‍⚕️", tags:["Coronary","Heart Failure"], conds:["cardiovascular","heart","coronary","heart failure"] },
+  { name:"Dr. Sunita Rao",     spec:"Endocrinologist",    specTe:"అంతఃస్రావ నిపుణుడు",  exp:"12 yrs", hospital:"Max Healthcare",    avatar:"👩‍⚕️", tags:["Diabetes","Thyroid"],      conds:["diabetes","thyroid","obesity","metabolic","glucose","insulin"] },
+  { name:"Dr. Vikram Patel",   spec:"Endocrinologist",    specTe:"అంతఃస్రావ నిపుణుడు",  exp:"10 yrs", hospital:"Fortis Hospital",   avatar:"👨‍⚕️", tags:["Diabetes T2","PCOS"],      conds:["diabetes","metabolic","pcos","blood sugar","type 2"] },
+  { name:"Dr. Meena Krishnan", spec:"Nephrologist",       specTe:"మూత్రపిండ నిపుణుడు",  exp:"16 yrs", hospital:"Manipal Hospital",  avatar:"👩‍⚕️", tags:["Kidney","CKD"],            conds:["kidney","renal","ckd","creatinine","proteinuria"] },
+  { name:"Dr. Rajesh Kumar",   spec:"Pulmonologist",      specTe:"ఊపిరితిత్తుల నిపుణుడు",exp:"11 yrs",hospital:"Narayana Health",  avatar:"👨‍⚕️", tags:["Asthma","COPD"],           conds:["asthma","copd","lung","pulmonary","respiratory","breathing"] },
+  { name:"Dr. Anita Desai",    spec:"Gastroenterologist", specTe:"జఠర నిపుణుడు",         exp:"13 yrs", hospital:"Lilavati Hospital", avatar:"👩‍⚕️", tags:["Liver","IBS"],             conds:["liver","gastro","ibs","stomach","digestive","fatty liver","hepatitis"] },
+  { name:"Dr. Suresh Nair",    spec:"Neurologist",        specTe:"నాడీ నిపుణుడు",        exp:"20 yrs", hospital:"NIMHANS",           avatar:"👨‍⚕️", tags:["Stroke","Migraine"],       conds:["stroke","epilepsy","migraine","neurological","brain","nerve"] },
+  { name:"Dr. Kavitha Iyer",   spec:"Hematologist",       specTe:"రక్త నిపుణుడు",        exp:"9 yrs",  hospital:"SGPGI",             avatar:"👩‍⚕️", tags:["Anemia","Blood"],          conds:["anemia","blood","hemoglobin","platelet","thalassemia"] },
+  { name:"Dr. Deepak Joshi",   spec:"General Physician",  specTe:"సాధారణ వైద్యుడు",      exp:"15 yrs", hospital:"City Clinic",       avatar:"👨‍⚕️", tags:["General","Infections"],    conds:["infection","fever","general","viral","fatigue","flu"] },
+  { name:"Dr. Nalini Reddy",   spec:"Rheumatologist",     specTe:"వాత నిపుణుడు",         exp:"12 yrs", hospital:"Yashoda Hospital",  avatar:"👩‍⚕️", tags:["Arthritis","Lupus"],       conds:["arthritis","lupus","joint","rheumatoid","autoimmune","gout"] },
+  { name:"Dr. Anil Bansal",    spec:"Orthopedic Surgeon", specTe:"ఎముక శస్త్రచికిత్సకుడు",exp:"17 yrs",hospital:"Medanta",          avatar:"👨‍⚕️", tags:["Bone","Osteoporosis"],     conds:["osteoporosis","bone","fracture","spine","orthopedic"] },
+];
+
+function matchDoctors(diseases) {
+  if (!diseases || !diseases.length) return [DOCTOR_DB[9]];
+  const txt = diseases.map(d=>(d.name+' '+d.description).toLowerCase()).join(' ');
+  const scored = DOCTOR_DB.map(doc => ({ ...doc, score: doc.conds.filter(c=>txt.includes(c)).length }))
+    .filter(d=>d.score>0).sort((a,b)=>b.score-a.score);
+  const result = scored.slice(0,4);
+  if (!result.length) result.push(DOCTOR_DB[9]);
+  return result;
+}
+
+function renderDoctors(diseases) {
+  const docs = matchDoctors(diseases);
+  document.getElementById('doctorsCount').textContent = docs.length + ' matched';
+  document.getElementById('doctorsGrid').innerHTML = docs.map(doc => `
+    <div class="doc-card">
+      <div class="doc-avatar">${doc.avatar}</div>
+      <div class="doc-info">
+        <div class="doc-name">${doc.name}</div>
+        <div class="doc-spec">${doc.spec}</div>
+        <div class="doc-spec-tel${currentLang==='te'?' show':''}">${doc.specTe}</div>
+        <div class="doc-detail">${doc.hospital} · ${doc.exp}</div>
+        <div class="doc-tags">${doc.tags.map(t=>`<span class="doc-tag">${t}</span>`).join('')}</div>
+        <div class="doc-match">${t('docMatchedLabel')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+// VOICE ENGINE
+// ═══════════════════════════════════════════════
+let recognition=null, isListening=false, isSpeaking=false;
+const SpeechRec = window.SpeechRecognition||window.webkitSpeechRecognition;
+const hasTTS = !!window.speechSynthesis;
+
+function openVoiceMode()  { document.getElementById('voiceModeOverlay').classList.add('open'); renderVmCmds(); }
+function closeVoiceMode() { document.getElementById('voiceModeOverlay').classList.remove('open'); if(isListening) stopListening(); }
+
+function toggleVoice() {
+  if (!SpeechRec) { alert('Speech recognition needs Chrome or Edge.'); return; }
+  isListening ? stopListening() : startListening();
+}
+
+function startListening() {
+  if (isSpeaking) stopSpeaking();
+  recognition = new SpeechRec();
+  recognition.lang = currentLang === 'te' ? 'te-IN' : 'en-US';
+  recognition.interimResults = true;
+  recognition.continuous = false;
+  recognition.onstart = () => { isListening=true; setVoiceState('listening'); };
+  recognition.onresult = (e) => {
+    let interim='', final='';
+    for (let i=e.resultIndex;i<e.results.length;i++) {
+      const tx = e.results[i][0].transcript;
+      e.results[i].isFinal ? final+=tx : interim+=tx;
+    }
+    const shown = final||interim;
+    document.getElementById('vmTranscript').textContent = shown ? `"${shown}"` : t('vmListeningStatus');
+    if (final) handleVoice(final.trim().toLowerCase(), final.trim());
+  };
+  recognition.onerror = (e) => { setVoiceState('idle'); document.getElementById('vmTranscript').textContent = e.error==='not-allowed'?'Mic access denied':'Could not hear. Try again.'; };
+  recognition.onend   = () => { isListening=false; if(!isSpeaking) setVoiceState('idle'); };
+  recognition.start();
+}
+
+function stopListening() { if(recognition) recognition.stop(); isListening=false; setVoiceState('idle'); }
+
+function handleVoice(lower, original) {
+  setVoiceState('processing');
+  document.getElementById('vmTranscript').textContent = `"${original}"`;
+
+  const isTE = currentLang==='te';
+  if (lower.includes('analyse')||lower.includes('analyze')||lower.includes('విశ్లేషించు')||lower.includes('report')) { speak(isTE?'విశ్లేషణ ప్రారంభమవుతోంది.':'Running analysis.'); setTimeout(runAnalysis,600); return; }
+  if (lower.includes('read')||lower.includes('diagnosis')||lower.includes('disease')||lower.includes('రోగ')||lower.includes('వ్యాధి')) { speakDiagnosis(); return; }
+  if (lower.includes('doctor')||lower.includes('specialist')||lower.includes('వైద్యుడు')||lower.includes('నిపుణుడు')) { speakDoctors(); return; }
+  if (lower.includes('result')||lower.includes('ఫలితాలు')||lower.includes('show')) {
+    const el=document.getElementById('results');
+    if(el.classList.contains('show')){ el.scrollIntoView({behavior:'smooth'}); speak(isTE?'ఫలితాలకు వెళ్తోంది.':'Scrolling to results.'); }
+    else speak(t('noResults')); setVoiceState('idle'); return;
+  }
+  if (lower.includes('stop')||lower.includes('ఆపు')) { stopSpeaking(); setVoiceState('idle'); return; }
+  if (lower.includes('lifestyle')||lower.includes('జీవనశైలి')) { sendVoiceChat(isTE?'జీవనశైలి చిట్కాలు చెప్పండి':'What lifestyle changes help?'); return; }
+  if (original.length>2) sendVoiceChat(original);
+  else setVoiceState('idle');
+}
+
+function quickVoiceCmd(i) {
+  const cmds_en = ['Analyse report','Read my diagnosis','Suggest doctors','What diseases were detected?','Show results','What lifestyle changes help?','Stop speaking'];
+  const cmds_te = ['రిపోర్ట్ విశ్లేషించు','నా రోగనిర్ధారణ చదువు','వైద్యులను సూచించు','వ్యాధులేమిటి','ఫలితాలు చూపించు','జీవనశైలి చిట్కాలు','ఆపు'];
+  const cmd = currentLang==='te' ? cmds_te[i] : cmds_en[i];
+  handleVoice(cmd.toLowerCase(), cmd);
+}
+
+function speakDiagnosis() {
+  const items = document.querySelectorAll('.disease-item');
+  if (!items.length) { speak(t('noDiagnosis')); return; }
+  let text = currentLang==='te' ? 'గుర్తించిన వ్యాధులు ఇవి. ' : 'Here are the detected conditions. ';
+  items.forEach(item => {
+    const name = item.querySelector('.di-name')?.textContent||'';
+    const desc = currentLang==='te' ? (item.querySelector('.di-translation')?.textContent||item.querySelector('.di-desc')?.textContent||'') : (item.querySelector('.di-desc')?.textContent||'');
+    const sev  = item.classList.contains('critical') ? (currentLang==='te'?'ఇది తీవ్రమైన సమస్య.':'This is a critical finding.') : item.classList.contains('warning') ? (currentLang==='te'?'దీనికి శ్రద్ధ అవసరం.':'This requires attention.') : (currentLang==='te'?'ఇది నిర్వహించగలిగే పరిధిలో ఉంది.':'This is within manageable range.');
+    text += `${name}. ${desc} ${sev} `;
+  });
+  document.getElementById('speakDiagBtn').classList.add('speaking');
+  document.getElementById('speakDiagIcon').textContent='⏹️';
+  document.getElementById('speakDiagLabel').textContent=t('stopSpeaking');
+  speak(text);
+}
+
+document.getElementById('speakDiagBtn').addEventListener('click', function() {
+  if (isSpeaking) {
+    stopSpeaking();
+    this.classList.remove('speaking');
+    document.getElementById('speakDiagIcon').textContent='🔊';
+    document.getElementById('speakDiagLabel').textContent=t('speakAloud');
+  }
+});
+
+function speakDoctors() {
+  const cards = document.querySelectorAll('.doc-card');
+  if (!cards.length) { speak(t('noDoctors')); return; }
+  const isTE = currentLang==='te';
+  let text = isTE ? 'మీ రిపోర్ట్ ఆధారంగా సిఫారసు చేయబడిన వైద్యులు ఇవి. ' : 'Based on your report, here are the recommended doctors. ';
+  cards.forEach(c => {
+    const name = c.querySelector('.doc-name')?.textContent||'';
+    const spec = isTE ? (c.querySelector('.doc-spec-tel')?.textContent||c.querySelector('.doc-spec')?.textContent||'') : (c.querySelector('.doc-spec')?.textContent||'');
+    const hosp = c.querySelector('.doc-detail')?.textContent||'';
+    text += `${name}, ${spec}${isTE?' వద్ద ':' at '}${hosp}. `;
+  });
+  speak(text);
+}
+
+async function sendVoiceChat(question) {
+  document.getElementById('chatInput').value=question;
+  document.getElementById('chatMsgs').scrollIntoView({behavior:'smooth'});
+  await sendChat();
+  setTimeout(() => {
+    const msgs=document.querySelectorAll('.msg.ai');
+    if(msgs.length) speak(msgs[msgs.length-1].textContent);
+  },300);
+}
+
+function speak(text) {
+  if (!hasTTS) return;
+  stopSpeaking();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = currentLang==='te' ? 'te-IN' : 'en-US';
+  utt.rate=0.95; utt.pitch=1; utt.volume=1;
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v=>v.lang===utt.lang) || voices.find(v=>v.lang.startsWith('en'));
+  if (preferred) utt.voice=preferred;
+  utt.onstart = ()=>{ isSpeaking=true; setVoiceState('speaking'); };
+  utt.onend   = ()=>{
+    isSpeaking=false; setVoiceState('idle');
+    document.getElementById('speakDiagBtn').classList.remove('speaking');
+    document.getElementById('speakDiagIcon').textContent='🔊';
+    document.getElementById('speakDiagLabel').textContent=t('speakAloud');
+  };
+  utt.onerror = ()=>{ isSpeaking=false; setVoiceState('idle'); };
+  speechSynthesis.speak(utt);
+}
+
+function stopSpeaking() { if(window.speechSynthesis) speechSynthesis.cancel(); isSpeaking=false; }
+
+function setVoiceState(state) {
+  const orb  = document.getElementById('vmOrb');
+  const wave = document.getElementById('vmWave');
+  const stat = document.getElementById('vmStatus');
+  const micB = document.getElementById('vmMicBtn');
+  const inlM = document.getElementById('inlineMicBtn');
+  orb.classList.remove('listening','speaking','processing');
+  wave.classList.remove('active','speaking');
+  micB.classList.remove('listening','speaking');
+  inlM.classList.remove('active');
+  if (state==='listening') {
+    orb.classList.add('listening'); orb.textContent='🔴'; wave.classList.add('active');
+    stat.textContent=t('vmListeningStatus'); stat.className='vm-status'+(currentLang==='te'?' telugu':'');
+    micB.classList.add('listening'); micB.textContent='⏹️'; inlM.classList.add('active'); inlM.textContent='⏹️';
+  } else if (state==='processing') {
+    orb.classList.add('processing'); orb.textContent='⏳';
+    stat.textContent=t('vmProcessingStatus'); stat.className='vm-status'+(currentLang==='te'?' telugu':'');
+  } else if (state==='speaking') {
+    orb.classList.add('speaking'); orb.textContent='🔊'; wave.classList.add('speaking');
+    stat.textContent=t('vmSpeakingStatus'); stat.className='vm-status'+(currentLang==='te'?' telugu':'');
+    micB.classList.add('speaking'); micB.textContent='⏹️';
+  } else {
+    orb.textContent='🎙️'; stat.textContent=t('vmIdleStatus'); stat.className='vm-status'+(currentLang==='te'?' telugu':'');
+    micB.textContent='🎙️'; inlM.textContent='🎙️';
+    if(!document.getElementById('vmTranscript').textContent.startsWith('"'))
+      document.getElementById('vmTranscript').textContent='';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════════════════
+let fileData=null, chatHistory=[];
+const uploadZone=document.getElementById('uploadZone');
+const fileInput=document.getElementById('fileInput');
+const fileChosen=document.getElementById('fileChosen');
+
+fileInput.addEventListener('change',e=>{ if(e.target.files[0]) pickFile(e.target.files[0]); });
+uploadZone.addEventListener('dragover',e=>{ e.preventDefault(); uploadZone.classList.add('over'); });
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('over'));
+uploadZone.addEventListener('drop',e=>{ e.preventDefault(); uploadZone.classList.remove('over'); if(e.dataTransfer.files[0]) pickFile(e.dataTransfer.files[0]); });
+document.getElementById('fcRemove').addEventListener('click',()=>{ fileInput.value=''; fileData=null; fileChosen.classList.remove('show'); uploadZone.classList.remove('scanning'); });
+
+function pickFile(file) {
+  document.getElementById('fcName').textContent=file.name;
+  document.getElementById('fcSize').textContent=(file.size/1024).toFixed(1)+' KB';
+  fileChosen.classList.add('show');
+  uploadZone.classList.add('scanning');
+  setTimeout(()=>uploadZone.classList.remove('scanning'),2200);
+  const reader=new FileReader();
+  reader.onload=e=>{ fileData=e.target.result; };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════════
+// ANALYSIS
+// ═══════════════════════════════════════════════
+async function runAnalysis() {
+  if (!fileData) { alert(t('noDiagnosis')); return; }
+  document.getElementById('runBtn').disabled=true;
+  showProcessing();
+  try {
+    const b64=fileData.split(',')[1];
+    const mime=fileData.split(';')[0].split(':')[1];
+    let content;
+    if (mime==='application/pdf'||mime.startsWith('image/')) {
+      content=[{type:mime==='application/pdf'?'document':'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:buildPrompt()}];
+    } else {
+      let text=''; try{text=decodeURIComponent(escape(atob(b64)));}catch{text=atob(b64);}
+      content=buildPrompt()+'\n\nREPORT DATA:\n'+text;
+    }
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content}]})
+    });
+    const data=await res.json();
+    const raw=data.content.map(i=>i.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    let parsed=null; try{parsed=JSON.parse(clean);}catch{}
+    hideProcessing();
+    if(parsed) populate(parsed);
+    else { document.getElementById('apText').textContent=raw; showResults(); }
+    chatHistory=[];
+    document.getElementById('chatMsgs').innerHTML='';
+    addMsg('ai',t('chatWelcome'));
+    setTimeout(()=>speak(t('analysisComplete')),500);
+  } catch(err){ hideProcessing(); alert('Something went wrong. Please try again.'); console.error(err); }
+  document.getElementById('runBtn').disabled=false;
+}
+
+function buildPrompt() {
+  return `Analyse this medical health report thoroughly. Return ONLY valid JSON, no markdown:
+{
+  "cardiovascular": { "level": "good|warn|bad", "value": "Low|Moderate|High", "percent": 30, "note": "brief note" },
+  "metabolic":      { "level": "good|warn|bad", "value": "Low|Moderate|High", "percent": 50, "note": "brief note" },
+  "overall":        { "level": "good|warn|bad", "value": "Low|Moderate|High", "percent": 40, "note": "brief note" },
+  "vitals": { "bp": "120/80 mmHg", "glucose": "95 mg/dL", "bmi": "23.4", "hr": "72 bpm" },
+  "diseases": [
+    {
+      "name": "Disease name in English",
+      "nameTe": "వ్యాధి పేరు తెలుగులో",
+      "severity": "critical|warning|normal",
+      "description": "1-2 sentence plain-language explanation in English",
+      "descriptionTe": "1-2 వాక్యాలు తెలుగులో వివరణ",
+      "indicators": ["specific biomarker that triggered this finding"]
+    }
+  ],
+  "summary": "2-3 paragraphs in plain English language describing the overall health status, key concerns, and recommended actions."
+}
+Detect ALL conditions visible including pre-diabetic states, elevated cholesterol, hypertension, anemia, thyroid issues, vitamin deficiencies, or any abnormality. For each disease, ALWAYS provide both English and Telugu fields.`;
+}
+
+function populate(p) {
+  setCard(1,p.cardiovascular,'🫀',t('rc1lbl'));
+  setCard(2,p.metabolic,'🧬',t('rc2lbl'));
+  setCard(3,p.overall,'⚡',t('rc3lbl'));
+  if(p.vitals){
+    document.getElementById('vBP').textContent=p.vitals.bp||'—';
+    document.getElementById('vGL').textContent=p.vitals.glucose||'—';
+    document.getElementById('vBM').textContent=p.vitals.bmi||'—';
+    document.getElementById('vHR').textContent=p.vitals.hr||'—';
+  }
+  renderDiseases(p.diseases||[]);
+  renderDoctors(p.diseases||[]);
+  document.getElementById('apText').textContent=p.summary||'—';
+  showResults();
+}
+
+function renderDiseases(diseases) {
+  const list=document.getElementById('diseaseList');
+  if(!diseases.length){
+    list.innerHTML=`<div style="font-size:13px;color:var(--muted);padding:8px 0">${currentLang==='te'?'నిర్దిష్ట పరిస్థితులు కనుగొనబడలేదు.':'No specific conditions detected.'}</div>`;
+    return;
+  }
+  list.innerHTML=diseases.map(d=>`
+    <div class="disease-item ${d.severity||'normal'}">
+      <span class="di-badge">${d.severity==='critical'?t('criticalBadge'):d.severity==='warning'?t('warningBadge'):t('noteBadge')}</span>
+      <div class="di-content">
+        <div class="di-name">${d.name}${d.nameTe?` <span style="font-family:'Noto Sans Telugu',sans-serif;font-size:12px;color:var(--purple);font-weight:400">· ${d.nameTe}</span>`:''}</div>
+        <div class="di-desc">${d.description||''}</div>
+        ${d.descriptionTe?`<div class="di-translation${currentLang==='te'?' show':''}">${d.descriptionTe}</div>`:''}
+        ${d.indicators?.length?`<div class="di-indicators">${d.indicators.map(i=>`<span class="di-ind">${i}</span>`).join('')}</div>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function setCard(n,d,ico,lbl){
+  if(!d) return;
+  document.getElementById('rc'+n).className='rcard '+(d.level||'good');
+  document.querySelector('#rc'+n+' .rc-ico').textContent=ico;
+  document.querySelector('#rc'+n+' .rc-lbl').textContent=lbl;
+  document.getElementById('rv'+n).textContent=d.value||'—';
+  document.getElementById('rn'+n).textContent=d.note||'';
+  setTimeout(()=>{ document.getElementById('rb'+n).style.width=(d.percent||0)+'%'; },120);
+}
+
+function showProcessing(){
+  const el=document.getElementById('processing');
+  el.classList.add('show');
+  const fill=document.getElementById('procFill');
+  fill.style.animation='none'; fill.offsetWidth; fill.style.animation='';
+  const stepsEl=document.getElementById('procSteps');
+  stepsEl.innerHTML='';
+  t('procMsgs').forEach((m,i)=>setTimeout(()=>{
+    const div=document.createElement('div');
+    div.className='proc-step'; div.style.animationDelay='0s';
+    div.innerHTML=`<span class="ps-dot"></span><span>${m}</span>`;
+    stepsEl.appendChild(div);
+  },i*650));
+}
+function hideProcessing(){ document.getElementById('processing').classList.remove('show'); }
+function showResults(){
+  const el=document.getElementById('results');
+  el.classList.add('show');
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+// ═══════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════
+function ask(q){ document.getElementById('chatInput').value=q; sendChat(); }
+
+async function sendChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim(); if(!msg) return;
+  const msgs=document.getElementById('chatMsgs');
+  const empty=msgs.querySelector('.chat-empty'); if(empty) empty.remove();
+  input.value=''; document.getElementById('sendBtn').disabled=true;
+  addMsg('user',msg); chatHistory.push({role:'user',content:msg});
+  const typing=document.createElement('div');
+  typing.className='msg typing'; typing.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(typing); msgs.scrollTop=msgs.scrollHeight;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:`You are a friendly health assistant. The user has a medical report analysed. Answer clearly in 2-3 sentences. ${currentLang==='te'?'Respond in Telugu (తెలుగు) language.':'Respond in English.'} Always recommend seeing a doctor for serious concerns.`,
+        messages:chatHistory})
+    });
+    const data=await res.json();
+    const reply=data.content.map(i=>i.text||'').join('');
+    chatHistory.push({role:'assistant',content:reply});
+    typing.remove(); addMsg('ai',reply);
+  }catch{ typing.remove(); addMsg('ai','Something went wrong. Please try again.'); }
+  document.getElementById('sendBtn').disabled=false;
+  input.focus();
+  return Promise.resolve();
+}
+
+function addMsg(who,text){
+  const msgs=document.getElementById('chatMsgs');
+  const div=document.createElement('div');
+  div.className='msg '+who; div.textContent=text;
+  if(who==='ai'&&currentLang==='te') div.style.fontFamily="'Noto Sans Telugu',sans-serif";
+  msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight;
+}
+
+// Init
+renderVmCmds();
+</script>
+</body>
+</html>
